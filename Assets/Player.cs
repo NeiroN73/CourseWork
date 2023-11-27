@@ -33,6 +33,16 @@ public class Player : MonoBehaviour
 
     private void Update()
     {
+        // Проверяем, была ли нажата клавиша прыжка
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            isJumping = true;
+
+        }
+    }
+
+    private void FixedUpdate()
+    {
         // Получаем значение горизонтальной оси (-1 для клавиши "A" или стрелки влево, 1 для клавиши "D" или стрелки вправо)
         float moveHorizontal = Input.GetAxis("Horizontal");
 
@@ -57,13 +67,6 @@ public class Player : MonoBehaviour
         else if(moveHorizontal > 0)
         {
             transform.rotation = Quaternion.Euler(0, 0, 0);
-        }
-
-        // Проверяем, была ли нажата клавиша прыжка
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            isJumping = true;
-            
         }
 
         // Анимация прыжка
@@ -108,7 +111,7 @@ public class Player : MonoBehaviour
         return check;
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
+    private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.gameObject.TryGetComponent(out Key key))
         {
@@ -116,13 +119,15 @@ public class Player : MonoBehaviour
         }
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.TryGetComponent(out Door door))
+        if (collision.gameObject.TryGetComponent(out Door door))
         {
             if (key != null)
             {
-                Dead();
+                door.Open();
+                Destroy(key.gameObject);
+                key = null;
             }
         }
     }
